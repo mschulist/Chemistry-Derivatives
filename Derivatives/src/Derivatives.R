@@ -5,10 +5,13 @@ library(here)
 library(XML)
 
 point_one_molar_xml <- xmlToDataFrame(here("Derivatives/input/0.10_NaOH.cmbl"))
-point_one_molar_xml <- xmlParse(here("Derivatives/input/0.10_NaOH.cmbl"))
+point_one_molar_xml_parse <- xmlParse(here("Derivatives/input/0.10_NaOH.cmbl"))
+point_one_molar <- xmlToList(point_one_molar_xml_parse)
+point_one_molar_time <- read_table(point_one_molar[["DataSet"]][["DataColumn"]][["ColumnCells"]],col_names = FALSE)
+point_one_molar_absorbance <- read_table(point_one_molar[["DataSet"]][["DataColumn"]][["ColumnCells"]],col_names = FALSE)
 
-point_one_molar <- read_csv(here("Derivatives/input/0.10_M_NaOH.csv"))
-point_zero_five_molar <- read_csv(here("Derivatives/input/0.05_M_NaOH.csv"))
+#point_one_molar <- read_csv(here("Derivatives/input/0.10_M_NaOH.csv"))
+#point_zero_five_molar <- read_csv(here("Derivatives/input/0.05_M_NaOH.csv"))
 
 ggplot()+
   geom_point(data = point_one_molar,aes(x=time,y=absorbance))+
