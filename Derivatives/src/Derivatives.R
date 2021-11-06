@@ -28,7 +28,7 @@ initial_point_one_molar <- point_one_molar[1:4,]
 initial_point_zero_five_molar <- point_zero_five_molar[1:4,]
 
 #Plotting the initial rates
-colors <- c("0.10 M NaOH" = "blue","0.05 M NaOH" = "orange")
+colors <- c("0.10 M NaOH" = "purple","0.05 M NaOH" = "green")
 ggplot()+
   geom_point(data = point_one_molar,aes(x=time,y=absorbance,color="0.10 M NaOH"))+
   geom_point(data = point_zero_five_molar,aes(x=time,y=absorbance,color="0.05 M NaOH"))+
@@ -42,3 +42,7 @@ ggplot()+
     y="Absorbance",
     color = "Legend"
   )
+
+#Getting the numbers
+lm(initial_point_one_molar$absorbance~initial_point_one_molar$time) %>% 
+  [["coefficients"]][["initial_point_one_molar$time"]] -> initial_rate_point_one_molar
