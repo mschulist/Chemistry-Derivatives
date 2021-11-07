@@ -60,7 +60,7 @@ rate_table <- arrange(rate_table,molarity)
 
 #Finally getting the order **Needed for order**
 
-order <- round(log(rate_table[2,2]/rate_table[1,2])/log(rate_table[2,1]/rate_table[1,1]))
+order <- log(round(rate_table[2,2]/rate_table[1,2]))/log(rate_table[2,1]/rate_table[1,1])
 print(order)
 
 
