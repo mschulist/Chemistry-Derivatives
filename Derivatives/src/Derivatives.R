@@ -52,13 +52,14 @@ initial_rate_point_zero_five_molar <- abs(initial_list_point_zero_five_molar[["c
 
 #Putting the rates into a table **Needed for order**
 
-rates <- c(initial_rate_point_one_molar,initial_rate_point_zero_five_molar)
-molarity <- c("0.10","0.05")
+rates <- c(initial_rate_point_zero_five_molar,initial_rate_point_one_molar)
+molarity <- c("0.05","0.10")
 rate_table <- data.frame(as.numeric(molarity),as.numeric(rates))
 colnames(rate_table) <- c("molarity","rate")
 
 #Finally getting the order **Needed for order**
 
-order <- round((rate_table[1,1]/rate_table[2,1])/(rate_table[1,2]/rate_table[2,2]))
+order <- round(log(rate_table[2,2]/rate_table[1,2])/log(rate_table[2,1]/rate_table[1,1]))
 print(order)
+
 
