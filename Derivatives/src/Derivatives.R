@@ -56,6 +56,7 @@ rates <- c(initial_rate_point_zero_five_molar,initial_rate_point_one_molar)
 molarity <- c("0.05","0.10")
 rate_table <- data.frame(as.numeric(molarity),as.numeric(rates))
 colnames(rate_table) <- c("molarity","rate")
+rate_table <- arrange(rate_table,molarity)
 
 #Finally getting the order **Needed for order**
 
