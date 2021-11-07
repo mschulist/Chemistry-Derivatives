@@ -3,18 +3,47 @@
 library(tidyverse)
 library(here)
 library(XML)
+library(xml2)
 library(ggpubr)
 
-#Importing Data (Doesn't work because Logger Pro has stupid formatting - uses the same name for different columns)
-#point_one_molar_xml <- xmlToDataFrame(here("Derivatives/input/0.10_NaOH.cmbl"))
-#point_one_molar_xml_parse <- xmlParse(here("Derivatives/input/0.10_NaOH.cmbl"))
-#point_one_molar_list <- xmlToList(point_one_molar_xml_parse)
-#point_one_molar_time <- read_table(point_one_molar[["DataSet"]][["DataColumn"]][["ColumnCells"]],col_names = FALSE)
-#point_one_molar_absorbance <- read_table(point_one_molar[["DataSet"]][["DataColumn"]][["ColumnCells"]],col_names = FALSE)
+#File Locations
+point_one_molar_cmbl <- here("Derivatives/input/0.10_NaOH.cmbl")
+point_zero_five_molar_cmbl <- here("Derivatives/input/0.05_NaOH.cmbl")
 
-#Boring way to import data **Needed for order**
-point_one_molar <- read_csv(here("Derivatives/input/0.10_M_NaOH.csv"))
-point_zero_five_molar <- read_csv(here("Derivatives/input/0.05_M_NaOH.csv"))
+#Importing Data
+point_one_molar_read <- read_xml(point_one_molar_cmbl)
+point_zero_five_molar_read <- read_xml(point_zero_five_molar_cmbl)
+#Sort by the Column Cells (the data we care about in the XML file)
+point_one_molar_columns <- point_one_molar_read %>% xml_find_all('//ColumnCells') 
+point_zero_five_molar_columns <- point_zero_five_molar_read %>% xml_find_all('//ColumnCells')
+#Get the nodes of the time and absorbance separately
+point_one_molar_time <- xmlParse(point_one_molar_columns[[1]])
+point_one_molar_absorbance <- xmlParse(point_one_molar_columns[[2]])
+point_zero_five_molar_time <- xmlParse(point_zero_five_molar_columns[[1]])
+point_zero_five_molar_absorbance <- xmlParse(point_zero_five_molar_columns[[2]])
+#Convert the nodes into vectors
+point_one_molar_time_list <- xmlToList(point_one_molar_time)
+point_one_molar_absorbance_list <- xmlToList(point_one_molar_absorbance)
+point_zero_five_molar_time_list <- xmlToList(point_zero_five_molar_time)
+point_zero_five_molar_absorbance_list <- xmlToList(point_zero_five_molar_absorbance)
+#Get rid of the "\n" delim
+point_one_molar_time_read <- read_csv(point_one_molar_time_list,col_names = FALSE)
+point_one_molar_absorbance_read <- read_csv(point_one_molar_absorbance_list,col_names = FALSE)
+point_zero_five_molar_time_read <- read_csv(point_zero_five_molar_time_list,col_names = FALSE)
+point_zero_five_molar_absorbance_read <- read_csv(point_zero_five_molar_absorbance_list,col_names = FALSE)
+#Add Column Names
+colnames(point_one_molar_time_read) <- "time"
+colnames(point_one_molar_absorbance_read) <- "absorbance"
+colnames(point_zero_five_molar_time_read) <- "time"
+colnames(point_zero_five_molar_absorbance_read) <- "absorbance"
+#Make the vectors into a data.frame
+point_one_molar <- tibble(point_one_molar_time_read,point_one_molar_absorbance_read)
+point_zero_five_molar <- tibble(point_zero_five_molar_time_read,point_zero_five_molar_absorbance_read)
+
+
+#Boring way to import data **Needed for order** (Fixed with XML Imports)
+#point_one_molar <- read_csv(here("Derivatives/input/0.10_M_NaOH.csv"))
+#point_zero_five_molar <- read_csv(here("Derivatives/input/0.05_M_NaOH.csv"))
 
 #Graphing Data
 ggplot()+
