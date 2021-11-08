@@ -527,7 +527,8 @@
       </MBLCalibration>
       <MBLColumnHeaderName></MBLColumnHeaderName>
       <MBLColumnHeaderShortName></MBLColumnHeaderShortName>
-      <MBLChannelMatch0>188Absorbance at %wl nm</MBLChannelMatch0>
+      <MBLChannelMatch0>188
+Absorbance at %wl nm</MBLChannelMatch0>
       <MBLSensorSourceID>159</MBLSensorSourceID>
       <MBLSensorPhotogateUnitsMeters>1</MBLSensorPhotogateUnitsMeters>
       <MBLSensorPhotogateUnits>m</MBLSensorPhotogateUnits>

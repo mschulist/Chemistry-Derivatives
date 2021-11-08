@@ -6,9 +6,16 @@ library(XML)
 library(xml2)
 library(ggpubr)
 
+#Get list of files
+input_list <- list.files("Derivatives/input")
+#Get the file for 0.05 and 0.10 Molar
+cmbl_files <- str_subset(input_list, pattern = "cmbl")
+point_one_molar_file <- str_subset(cmbl_files, pattern = "10")
+point_zero_five_molar_file <- str_subset(cmbl_files, pattern = "5")
+
 #File Locations **Needed for order**
-point_one_molar_cmbl <- here("Derivatives/input/0.10_NaOH.cmbl")
-point_zero_five_molar_cmbl <- here("Derivatives/input/0.05_NaOH.cmbl")
+point_one_molar_cmbl <- here("Derivatives/input/", point_one_molar_file)
+point_zero_five_molar_cmbl <- here("Derivatives/input/", point_zero_five_molar_file)
 
 #Importing Data **Needed for order**
 point_one_molar_read <- read_xml(point_one_molar_cmbl)
