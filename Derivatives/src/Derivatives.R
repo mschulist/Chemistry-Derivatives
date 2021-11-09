@@ -5,6 +5,8 @@ library(here)
 library(XML)
 library(xml2)
 library(ggpubr)
+library(ggpmisc)
+library(cowplot)
 
 #Get list of files
 input_list <- list.files("Derivatives/input")
@@ -98,4 +100,66 @@ rate_table <- arrange(rate_table,molarity)
 order <- log(round(rate_table[2,2]/rate_table[1,2]))/log(rate_table[2,1]/rate_table[1,1])
 print(order)
 
+rm(list=ls()[! ls() %in% c("point_one_molar","point_zero_five_molar")])
+
+#Using the integrated rate law
+point_one_molar %>% 
+  mutate(log(point_one_molar$absorbance)) %>% 
+  mutate(1/point_one_molar$absorbance) -> int_point_one_molar
+colnames(int_point_one_molar) <- c("time","absorbance","ln_absorbance","1/absorbance")
+
+point_zero_five_molar %>% 
+  mutate(log(point_zero_five_molar$absorbance)) %>% 
+  mutate(1/point_zero_five_molar$absorbance) -> int_point_zero_five_molar
+
+#Graphing the integrating
+#Oth Order
+ggplot(data = int_point_one_molar,aes(x=time,y=absorbance))+
+  geom_point()+
+  geom_smooth(method = "lm",se=FALSE)+
+  stat_cor(r.digits = 5)+
+  labs(
+    title = "0th Order"
+  ) -> zero_order
+
+#1st Order
+ggplot(data = int_point_one_molar,aes(x=time,y=ln_absorbance))+
+  geom_point()+
+  geom_smooth(method = "lm",se=FALSE)+
+  stat_cor(r.digits = 5)+
+  labs(
+    title = "1st Order"
+  ) -> first_order
+
+#2nd Order 
+ggplot(data = int_point_one_molar,aes(x=time,y=1/absorbance))+
+  geom_point()+
+  geom_smooth(method = "lm",se=FALSE)+
+  stat_cor(r.digits = 5)+
+  labs(
+    title = "2nd Order"
+  ) -> second_order
+
+#All Together graphing
+plot_grid(
+  zero_order,
+  first_order,
+  second_order
+)
+
+#Find the order from the highest R^2 value
+zero_order_r_squared <- summary(lm(int_point_one_molar$absorbance~int_point_one_molar$time))[["r.squared"]]
+first_order_r_squared <- summary(lm(int_point_one_molar$ln_absorbance~int_point_one_molar$time))[["r.squared"]]
+second_order_r_squared <- summary(lm(int_point_one_molar$`1/absorbance`~int_point_one_molar$time))[["r.squared"]]
+
+r_squared_tibble <- tibble(c(zero_order_r_squared,first_order_r_squared,second_order_r_squared),c(0,1,2)) 
+colnames(r_squared_tibble) <- c("r_squared","order")
+r_squared_tibble %>% 
+  filter(r_squared==max(r_squared_tibble$r_squared)) -> max_r_squared
+
+#Finally printing the order
+print(max_r_squared$order)
+
+#Cleaning up 
+rm(list=ls()[! ls() %in% c("point_one_molar","point_zero_five_molar")])
 
