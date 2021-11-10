@@ -7,7 +7,7 @@ Instructions for finding the order using integrated rate laws:
 
 Download R from https://cran.r-project.org/ <br>
 Install the appropriate packages using this command (unless you already have them): <br>
-`install.packages("tidyverse","here","ggpubr","ggmpisc","cowplot","googlesheets4")` <br>
+`install.packages(c("tidyverse","here","ggpubr","ggmpisc","cowplot","googlesheets4"))` <br>
 
 Clone the repo (or just download it since you won't be changing it) <br>
 Type this into the command line: <br>
