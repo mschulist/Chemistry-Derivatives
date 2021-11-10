@@ -2,3 +2,15 @@
 Wasting my weekends in R to procrastiate English essays. 
 Using linear steps to do my chem work for me. 
 All in R.
+
+Instructions for finding the order using integrated rate laws:
+
+Download R from https://cran.r-project.org/ <br>
+Install the appropriate packages using this command (unless you already have them): <br>
+`install.packages("tidyverse","here","ggpubr","ggmpisc","cowplot","googlesheets4")` <br>
+
+Clone the repo (or just download it since you won't be changing it) <br>
+Type this into the command line: <br>
+`Rscript [insert_path_here]` replace [insert_path_here] with the file path
+
+You should see the order printed in the console!
