@@ -10,6 +10,7 @@ library(shiny)
 library(googlesheets4)
 
 #Download Data
+gs4_deauth()
 raw_data <- read_sheet("1a8l07lQ10MwJUHiL4wxex1g1ewfrx2GVZhUAc7FDFwg")
 colnames(raw_data) <-  c("time","absorbance")
 
@@ -63,7 +64,7 @@ second_order_r_squared <- summary(lm(int_data$`1/absorbance`~int_data$time))[["r
 r_squared_tibble <- tibble(c(zero_order_r_squared,first_order_r_squared,second_order_r_squared),c(0,1,2)) 
 colnames(r_squared_tibble) <- c("r_squared","order")
 r_squared_tibble %>% 
-  filter(r_squared==max(r_squared_tibble$r_squared)) -> max_r_squared
+  filter(r_squared==max(abs(r_squared_tibble$r_squared))) -> max_r_squared
 
 #Finally printing the order
 print(max_r_squared$order)
