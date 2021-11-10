@@ -11,6 +11,8 @@ Install the appropriate packages using this command (unless you already have the
 
 Clone the repo (or just download it since you won't be changing it) <br>
 Type this into the command line: <br>
-`Rscript [insert_path_here]` replace [insert_path_here] with the file path
+`cd [file_path_to_repo]` and replace [file_path_to_repo] with the path to where you cloned the repo <br>
+Then, type this to run the script <br>
+`Rscript google_sheet_orders.R` 
 
 You should see the order printed in the console!
