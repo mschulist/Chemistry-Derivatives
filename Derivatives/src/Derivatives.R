@@ -7,6 +7,8 @@ library(xml2)
 library(ggpubr)
 library(ggpmisc)
 library(cowplot)
+library(shiny)
+library(googlesheets4)
 
 #Get list of files
 input_list <- list.files("Derivatives/input")
