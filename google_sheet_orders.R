@@ -6,7 +6,6 @@ library(here)
 library(ggpubr)
 library(ggpmisc)
 library(cowplot)
-library(shiny)
 library(googlesheets4)
 
 #Download Data
@@ -39,6 +38,7 @@ ggplot(data = int_data,aes(x=time,y=ln_absorbance))+
     title = "1st Order"
   ) -> first_order_graph
 
+
 #2nd Order 
 ggplot(data = int_data,aes(x=time,y=1/absorbance))+
   geom_point()+
@@ -52,8 +52,8 @@ ggplot(data = int_data,aes(x=time,y=1/absorbance))+
 plot_grid(
   zero_order_graph,
   first_order_graph,
-  second_order_graph
-)
+  second_order_graph)
+
 
 #Find the order from the highest R^2 value
 zero_order_r_squared <- summary(lm(int_data$absorbance~int_data$time))[["r.squared"]]

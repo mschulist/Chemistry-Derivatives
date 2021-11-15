@@ -7,7 +7,6 @@ library(xml2)
 library(ggpubr)
 library(ggpmisc)
 library(cowplot)
-library(shiny)
 library(googlesheets4)
 
 #Get list of files
@@ -57,12 +56,21 @@ rm(list=ls()[! ls() %in% c("point_one_molar","point_zero_five_molar")])
 #point_one_molar <- read_csv(here("Derivatives/input/0.10_M_NaOH.csv"))
 #point_zero_five_molar <- read_csv(here("Derivatives/input/0.05_M_NaOH.csv"))
 
+#Getting the best fit curves
+point_one_molar_fit <- summary(lm(point_one_molar$absorbance~poly(point_one_molar$time,5,raw=TRUE), data=point_one_molar))[["coefficients"]]
+point_zero_five_molar_fit <- lm(point_zero_five_molar$absorbance~poly(point_zero_five_molar$time,5,raw=TRUE), data=point_zero_five_molar)
+
+
 #Graphing Data
+colors <- c("0.10 M NaOH" = "purple","0.05 M NaOH" = "green")
 ggplot()+
-  geom_point(data = point_one_molar,aes(x=time,y=absorbance))+
-  geom_point(data = point_zero_five_molar,aes(x=time,y=absorbance))+
-  geom_smooth(data = point_one_molar,aes(x=time,y=absorbance),color="purple")+
-  geom_smooth(data = point_zero_five_molar,aes(x=time,y=absorbance),color="green")
+  geom_point(data = point_one_molar,aes(x=time,y=absorbance, color = "0.10 M NaOH"))+
+  geom_point(data = point_zero_five_molar,aes(x=time,y=absorbance, color = "0.05 M NaOH"))+
+  geom_smooth(data = point_zero_five_molar, aes(x=time, y=absorbance), method = "gam", se = F)
+  labs(
+    title = "Absorbance of Crystal Violet vs Time of 0.10 M and 0.05 M NaOH",
+    color = "Concentration of NaOH"
+  )+ xlab("Time (s)")+ylab("Absorbance (Au)")
 
 #Getting first 4 points (est. using first 4 points) **Needed for order**
 initial_point_one_molar <- point_one_molar[1:4,]
@@ -75,13 +83,13 @@ ggplot()+
   geom_point(data = point_zero_five_molar,aes(x=time,y=absorbance,color="0.05 M NaOH"))+
   geom_smooth(data = initial_point_one_molar,aes(x=time,y=absorbance,color="0.10 M NaOH"),method="lm",se=FALSE,fullrange=T)+
   geom_smooth(data = initial_point_zero_five_molar,aes(x=time,y=absorbance,color="0.05 M NaOH"),method="lm",se=FALSE,fullrange=T)+
-  stat_regline_equation(data=initial_point_one_molar,aes(x=time, y=absorbance),label.x=0,label.y = .35)+
+  stat_regline_equation(data=initial_point_one_molar,aes(x=time, y=absorbance),label.x=0,label.y = .4)+
   stat_regline_equation(data=initial_point_zero_five_molar,aes(x=time, y=absorbance),label.x=40,label.y = .58)+
   ylim(.1,.65)+ ggtitle("Crystal Violet Absorbance Over Time: Initial Rates")+
   labs(
-    x="Time",
-    y="Absorbance",
-    color = "Legend"
+    x="Time (s)",
+    y="Absorbance (Au)",
+    color = "Concentration"
   )
 
 #Getting the numbers **Needed for order**
@@ -119,7 +127,8 @@ point_zero_five_molar %>%
 ggplot(data = int_point_one_molar,aes(x=time,y=absorbance))+
   geom_point()+
   geom_smooth(method = "lm",se=FALSE)+
-  stat_cor(r.digits = 5,label.x = 50)+
+  stat_cor(aes(label = ..r.label..),r.digits = 5, label.x = 25)+
+  xlab("Time (s)") + ylab("Absorbance")+
   labs(
     title = "0th Order"
   ) -> zero_order
@@ -128,7 +137,8 @@ ggplot(data = int_point_one_molar,aes(x=time,y=absorbance))+
 ggplot(data = int_point_one_molar,aes(x=time,y=ln_absorbance))+
   geom_point()+
   geom_smooth(method = "lm",se=FALSE)+
-  stat_cor(r.digits = 5,label.x = 50)+
+  stat_cor(aes(label = ..r.label..),r.digits = 5, label.x = 30)+
+  xlab("Time (s)") + ylab("ln(absorbance)")+
   labs(
     title = "1st Order"
   ) -> first_order
@@ -137,7 +147,8 @@ ggplot(data = int_point_one_molar,aes(x=time,y=ln_absorbance))+
 ggplot(data = int_point_one_molar,aes(x=time,y=1/absorbance))+
   geom_point()+
   geom_smooth(method = "lm",se=FALSE)+
-  stat_cor(r.digits = 5, label.x = 50)+
+  stat_cor(aes(label = ..r.label..),r.digits = 5, label.x = 100)+
+  xlab("Time (s)") + ylab("1/absorbance")+
   labs(
     title = "2nd Order"
   ) -> second_order
