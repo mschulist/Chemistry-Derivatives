@@ -119,7 +119,7 @@ point_zero_five_molar %>%
 ggplot(data = int_point_one_molar,aes(x=time,y=absorbance))+
   geom_point()+
   geom_smooth(method = "lm",se=FALSE)+
-  stat_cor(r.digits = 5)+
+  stat_cor(r.digits = 5,label.x = 50)+
   labs(
     title = "0th Order"
   ) -> zero_order
@@ -128,7 +128,7 @@ ggplot(data = int_point_one_molar,aes(x=time,y=absorbance))+
 ggplot(data = int_point_one_molar,aes(x=time,y=ln_absorbance))+
   geom_point()+
   geom_smooth(method = "lm",se=FALSE)+
-  stat_cor(r.digits = 5)+
+  stat_cor(r.digits = 5,label.x = 50)+
   labs(
     title = "1st Order"
   ) -> first_order
@@ -137,7 +137,7 @@ ggplot(data = int_point_one_molar,aes(x=time,y=ln_absorbance))+
 ggplot(data = int_point_one_molar,aes(x=time,y=1/absorbance))+
   geom_point()+
   geom_smooth(method = "lm",se=FALSE)+
-  stat_cor(r.digits = 5)+
+  stat_cor(r.digits = 5, label.x = 50)+
   labs(
     title = "2nd Order"
   ) -> second_order
@@ -165,3 +165,31 @@ print(max_r_squared$order)
 #Cleaning up 
 rm(list=ls()[! ls() %in% c("point_one_molar","point_zero_five_molar")])
 
+#Getting the k value
+#rate = k[CV][OH]
+#rate/[CV][OH] = k
+#Finding the rate requires finding the derivative of the points
+#Concentration of OH is known at 0.05 M or 0.10 M
+#Concentration of [CV] requires Beer's Law
+#Beer's Law: Absorbance = length(1cm) * constant * concentration
+#absorbance/constant = concentration
+#constant for 566.7 wavelength is 58291
+#absorbance/58291 = concentration
+
+point_one_molar <- point_one_molar %>% 
+  mutate(concentration = absorbance/58291)
+
+#Now that we have the concentration, we can make a function which is the best fit curve for the concentration
+point_one_molar_fit <- lm(point_one_molar$concentration~poly(point_one_molar$time,5,raw=TRUE), data = point_one_molar)
+
+#Making a function
+regression_function <- function(x){
+  concentration <- point_one_molar_fit[["coefficients"]][["(Intercept)"]] + (point_one_molar_fit[["coefficients"]][["poly(point_one_molar$time, 5, raw = TRUE)1"]]*x) + (point_one_molar_fit[["coefficients"]][["poly(point_one_molar$time, 5, raw = TRUE)2"]]*x^2) + (point_one_molar_fit[["coefficients"]][["poly(point_one_molar$time, 5, raw = TRUE)3"]]*x^3) + (point_one_molar_fit[["coefficients"]][["poly(point_one_molar$time, 5, raw = TRUE)4"]]*x^4) + (point_one_molar_fit[["coefficients"]][["poly(point_one_molar$time, 5, raw = TRUE)5"]]*x^5)
+}
+
+#Getting the derivative of the function
+point_one_molar_deriv <- deriv(regression_function(x),"x")
+
+#Using the best fit function to get rates for given times
+point_one_molar <- point_one_molar %>% 
+  mutate(rate = regression_function(time))
