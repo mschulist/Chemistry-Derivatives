@@ -186,21 +186,24 @@ rm(list=ls()[! ls() %in% c("point_one_molar","point_zero_five_molar")])
 #absorbance/constant = concentration
 #constant for 566.7 wavelength is 58291
 #absorbance/58291 = concentration
-
 point_one_molar <- point_one_molar %>% 
   mutate(concentration = absorbance/58291)
 
-#Now that we have the concentration, we can make a function which is the best fit curve for the concentration
-point_one_molar_fit <- lm(point_one_molar$concentration~poly(point_one_molar$time,5,raw=TRUE), data = point_one_molar)
+#Making another table with points from a best fit curve
+point_one_molar_points <- loess.smooth(point_one_molar$time, point_one_molar$concentration, evaluation = length(point_one_molar$time)) %>% 
+  as.data.frame() %>% 
+  rename(time = x, concentration = y)
 
-#Making a function
-regression_function <- function(x){
-  concentration <- point_one_molar_fit[["coefficients"]][["(Intercept)"]] + (point_one_molar_fit[["coefficients"]][["poly(point_one_molar$time, 5, raw = TRUE)1"]]*x) + (point_one_molar_fit[["coefficients"]][["poly(point_one_molar$time, 5, raw = TRUE)2"]]*x^2) + (point_one_molar_fit[["coefficients"]][["poly(point_one_molar$time, 5, raw = TRUE)3"]]*x^3) + (point_one_molar_fit[["coefficients"]][["poly(point_one_molar$time, 5, raw = TRUE)4"]]*x^4) + (point_one_molar_fit[["coefficients"]][["poly(point_one_molar$time, 5, raw = TRUE)5"]]*x^5)
-}
+#Now getting the rates for each given time
+rates <- unlist(map(.x = 1:length(point_one_molar_points$time), ~nth(point_one_molar_points$concentration,.x)-nth(point_one_molar_points$concentration,.x-1)/((nth(point_one_molar_points$time,.x)-(nth(point_one_molar_points$time,.x-1))))))
 
-#Getting the derivative of the function
-point_one_molar_deriv <- deriv(regression_function(x),"x")
+#Adding rates to the point_one_molar df
+point_one_molar_points <- point_one_molar_points %>% 
+  mutate(rates)
 
-#Using the best fit function to get rates for given times
-point_one_molar <- point_one_molar %>% 
-  mutate(rate = regression_function(time))
+#Getting the k value
+k_values <- as_vector(map2(.x = point_one_molar_points$concentration, .y = point_one_molar_points$rates, ~.y/(.x * 0.1)))
+
+k_value <- mean(k_values, na.rm = T)
+print(k_value)
+
